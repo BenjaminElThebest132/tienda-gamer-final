@@ -1,33 +1,58 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
 
 const CartContext = createContext();
 
-export function CartProvider({ children }) {
-  const [cart, setCart] = useState([]);
+export const useCart = () => useContext(CartContext);
 
+export const CartProvider = ({ children }) => {
+  // 1. Intentamos leer el carrito guardado en el navegador al iniciar
+  const [cart, setCart] = useState(() => {
+    try {
+      const carritoGuardado = localStorage.getItem('carrito');
+      return carritoGuardado ? JSON.parse(carritoGuardado) : [];
+    } catch (error) {
+      return [];
+    }
+  });
+
+  // 2. Cada vez que el carrito cambie, lo guardamos en el navegador
+  useEffect(() => {
+    localStorage.setItem('carrito', JSON.stringify(cart));
+  }, [cart]);
+
+  // --- FUNCIÓN PARA AGREGAR (La Magia del +1) ---
   const addToCart = (product) => {
-    setCart(prev => {
-      const existing = prev.find(p => p.id === product.id);
-      if (existing) {
-        return prev.map(p => p.id === product.id ? { ...p, qty: p.qty + 1 } : p);
+    setCart(prevCart => {
+      // Buscamos si el producto ya existe en el carrito
+      const existe = prevCart.find(item => item.id === product.id);
+
+      if (existe) {
+        // Si existe, le sumamos 1 a la cantidad
+        return prevCart.map(item =>
+          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+        );
+      } else {
+        // Si no existe, lo agregamos con cantidad 1
+        // Aseguramos que tenga precio (sea 'price' o 'precio')
+        const precioFinal = Number(product.price || product.precio || 0);
+        return [...prevCart, { ...product, quantity: 1, precio: precioFinal }];
       }
-      return [...prev, { ...product, qty: 1 }];
     });
   };
 
-  const removeFromCart = (productId) => {
-    setCart(prev => prev.filter(p => p.id !== productId));
+  // Función para borrar un producto
+  const removeFromCart = (id) => {
+    setCart(prevCart => prevCart.filter(item => item.id !== id));
   };
 
-  const clearCart = () => setCart([]);
+  // Función para vaciar todo (al comprar)
+  const clearCart = () => {
+    setCart([]);
+  };
 
   return (
     <CartContext.Provider value={{ cart, addToCart, removeFromCart, clearCart }}>
       {children}
     </CartContext.Provider>
   );
-}
-
-export function useCart() {
-  return useContext(CartContext);
-}
+};

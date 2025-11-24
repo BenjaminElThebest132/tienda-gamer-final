@@ -10,7 +10,7 @@ export default function ProductCard({ product, onAddToCart }) {
   return (
     <div className="card h-100 shadow-sm bg-dark text-white border-secondary">
       {/* Imagen del producto */}
-      <div style={{ backgroundColor: '#fff', padding: '5px', borderTopLeftRadius: 'calc(0.375rem - 1px)', borderTopRightRadius: 'calc(0.375rem - 1px)' }}>
+      <div style={{ backgroundColor: '#2a2727ff', padding: '5px', borderTopLeftRadius: 'calc(0.375rem - 1px)', borderTopRightRadius: 'calc(0.375rem - 1px)' }}>
         <img 
           src={imagen} 
           className="card-img-top" 
