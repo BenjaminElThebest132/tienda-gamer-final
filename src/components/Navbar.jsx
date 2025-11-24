@@ -8,7 +8,7 @@ export default function Navbar() {
   
   const usuarioGuardado = JSON.parse(localStorage.getItem('usuario'));
   
-  // Calculamos el total de items sumando las cantidades
+  // Sumamos la cantidad total de productos
   const totalItems = cart.reduce((acc, item) => acc + item.quantity, 0);
 
   const handleLogout = () => {
@@ -40,24 +40,41 @@ export default function Navbar() {
 
           <div className="d-flex align-items-center gap-3">
             
-            {/* --- BOTÓN CARRITO (Estilo Texto Simple) --- */}
+            {/* BOTÓN CARRITO */}
             <Link to="/checkout" className="btn btn-outline-success fw-bold">
               🛒 Carrito {totalItems > 0 ? `(${totalItems})` : ''}
             </Link>
-            {/* ------------------------------------------- */}
 
+            {/* MENU DE USUARIO (DROPDOWN) */}
             {usuarioGuardado ? (
               <div className="dropdown">
-                <button className="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                {/* El atributo data-bs-toggle="dropdown" es el que hace la magia */}
+                <button 
+                  className="btn btn-secondary dropdown-toggle" 
+                  type="button" 
+                  id="userMenu" 
+                  data-bs-toggle="dropdown" 
+                  aria-expanded="false"
+                >
                   👤 {usuarioGuardado.nombre}
                 </button>
-                <ul className="dropdown-menu dropdown-menu-end dropdown-menu-dark">
-                  {/* Solo mostramos Admin si el correo coincide */}
-                  {usuarioGuardado.email === 'admin@tienda.com' && (
-                      <li><Link className="dropdown-item text-warning" to="/admin/dashboard">⚙️ Panel Admin</Link></li>
-                  )}
+                
+                <ul className="dropdown-menu dropdown-menu-end dropdown-menu-dark" aria-labelledby="userMenu">
+                  {/* Link al Admin (Visible para todos para la demo) */}
+                  <li>
+                    <Link className="dropdown-item text-warning" to="/admin/dashboard">
+                      ⚙️ Panel Admin
+                    </Link>
+                  </li>
+                  
                   <li><hr className="dropdown-divider" /></li>
-                  <li><button className="dropdown-item text-danger" onClick={handleLogout}>Cerrar Sesión</button></li>
+                  
+                  {/* Logout */}
+                  <li>
+                    <button className="dropdown-item text-danger" onClick={handleLogout}>
+                      Cerrar Sesión
+                    </button>
+                  </li>
                 </ul>
               </div>
             ) : (

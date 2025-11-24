@@ -1,3 +1,4 @@
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 const express = require('express');
 const cors = require('cors');
 
