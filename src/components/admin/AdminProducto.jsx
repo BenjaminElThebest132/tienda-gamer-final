@@ -6,7 +6,7 @@ export default function AdminProducto() {
 
   // 1. Función para cargar productos desde el Backend
   const cargarProductos = () => {
-    fetch('http://localhost:4000/api/productos')
+    fetch('https://tienda-gamer-final.onrender.com/api/productos')
       .then(res => res.json())
       .then(data => setProductos(data))
       .catch(err => setError('Error al cargar productos'));
@@ -22,7 +22,7 @@ export default function AdminProducto() {
     if (!window.confirm("¿Estás seguro de que quieres eliminar este producto?")) return;
 
     try {
-      const res = await fetch(`http://localhost:4000/api/productos/${id}`, {
+      const res = await fetch(`https://tienda-gamer-final.onrender.com/api/productos/${id}`, {
         method: 'DELETE'
       });
 

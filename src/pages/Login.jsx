@@ -16,7 +16,7 @@ export default function Login() {
 
     try {
       // 2. CONEXIÓN REAL AL BACKEND
-      const response = await fetch('http://localhost:4000/api/login', {
+      const response = await fetch('https://tienda-gamer-final.onrender.com/api/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

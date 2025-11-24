@@ -11,7 +11,7 @@ export default function ProductList() {
 
   useEffect(() => {
     // LLAMADA AL BACKEND REAL (El "Endpoint" que creamos)
-    fetch('http://localhost:4000/api/productos')
+    fetch('https://tienda-gamer-final.onrender.com/api/productos')
       .then((response) => {
         if (!response.ok) {
           throw new Error('Error al conectar con el servidor');
