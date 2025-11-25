@@ -10,9 +10,10 @@ import PaymentError from './pages/PaymentError';
 import AdminPanel from './pages/AdminPanel';
 import Login from './pages/Login';
 import { CartProvider } from './context/CartContext';
-import PrivateRoute from './components/PrivateRoute';
 
-// Importa los nuevos componentes de página (que crearás en el siguiente paso)
+// IMPORTANTE: Importamos el nuevo componente de seguridad
+import AdminRoute from './components/AdminRoute';
+
 import Nosotros from './pages/Nosotros';
 import Blog from './pages/Blog';
 import Contacto from './pages/Contacto';
@@ -27,7 +28,7 @@ export default function App() {
         <Navbar />
         <div className="container container-main" style={{ paddingTop: '70px' }}>
           <Routes>
-            {/* Rutas existentes */}
+            {/* Rutas Públicas */}
             <Route path="/" element={<Home />} />
             <Route path="/shop" element={<Shop />} />
             <Route path="/product/:id" element={<ProductDetail />} />
@@ -35,15 +36,24 @@ export default function App() {
             <Route path="/payment-success" element={<PaymentSuccess />} />
             <Route path="/payment-error" element={<PaymentError />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/admin/*" element={<PrivateRoute><AdminPanel /></PrivateRoute>} />
             
-            {/* --- NUEVAS RUTAS AÑADIDAS --- */}
             <Route path="/nosotros" element={<Nosotros />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/contacto" element={<Contacto />} />
             <Route path="/ofertas" element={<Ofertas />} />
             <Route path="/categorias" element={<Categorias />} />
             <Route path="/registro" element={<Registro />} />
+
+            {/* RUTA PROTEGIDA SOLO PARA ADMIN */}
+            {/* Usamos AdminRoute para envolver el panel */}
+            <Route 
+              path="/admin/*" 
+              element={
+                <AdminRoute>
+                  <AdminPanel />
+                </AdminRoute>
+              } 
+            />
             
             {/* Ruta comodín */}
             <Route path="*" element={<Navigate to="/" replace />} />
