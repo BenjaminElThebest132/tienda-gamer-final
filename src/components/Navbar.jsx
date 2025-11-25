@@ -1,12 +1,12 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useCart } from '../context/CartContext'; // SI TE DA ERROR AQUÍ, PRUEBA CON './CartContext'
+import { useCart } from '../context/CartContext';
 
 export default function Navbar() {
   const { cart } = useCart();
   const navigate = useNavigate();
 
-  // 1. Recuperamos el usuario (con protección anti-crash)
+  // 1. Recuperamos el usuario de forma segura
   let usuarioGuardado = null;
   try {
     usuarioGuardado = JSON.parse(localStorage.getItem('usuario'));
@@ -14,18 +14,25 @@ export default function Navbar() {
     usuarioGuardado = null;
   }
 
+  // 2. DETECTOR DE ADMIN (A prueba de fallos)
+  let esAdmin = false;
+  if (usuarioGuardado) {
+    // Buscamos el email ya sea que venga directo o dentro de un objeto 'usuario'
+    const email = usuarioGuardado.email || (usuarioGuardado.usuario && usuarioGuardado.usuario.email) || '';
+    
+    // Comparamos convirtiendo a minúsculas y quitando espacios vacíos
+    if (email.toLowerCase().trim() === 'admin@tienda.com') {
+      esAdmin = true;
+    }
+  }
+
   // Calculamos items del carrito
   const totalItems = cart.reduce((acc, item) => acc + item.quantity, 0);
 
-  // Logout
   const handleLogout = () => {
     localStorage.removeItem('usuario');
     navigate('/login');
   };
-
-  // 2. VERIFICACIÓN DE ADMIN
-  // Si existe usuario Y su email es el del jefe...
-  const esAdmin = usuarioGuardado && usuarioGuardado.email === 'admin@tienda.com';
 
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark fixed-top shadow">
@@ -34,12 +41,7 @@ export default function Navbar() {
            🎮 TiendaGamer
         </Link>
         
-        <button 
-          className="navbar-toggler" 
-          type="button" 
-          data-bs-toggle="collapse" 
-          data-bs-target="#navbarNav"
-        >
+        <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
           <span className="navbar-toggler-icon"></span>
         </button>
         
@@ -54,8 +56,7 @@ export default function Navbar() {
           </ul>
 
           <div className="d-flex align-items-center gap-3">
-            
-            {/* Botón Carrito */}
+            {/* BOTÓN CARRITO */}
             <Link to="/checkout" className="btn btn-outline-success fw-bold position-relative">
                🛒 Carrito
                {totalItems > 0 && (
@@ -65,7 +66,7 @@ export default function Navbar() {
                )}
             </Link>
 
-            {/* Menú de Usuario */}
+            {/* MENÚ DE USUARIO */}
             {usuarioGuardado ? (
               <div className="dropdown">
                 <button 
@@ -76,14 +77,14 @@ export default function Navbar() {
                   aria-expanded="false"
                 >
                   <i className="bi bi-person-circle"></i>
-                  {/* AQUÍ ESTÁ EL CAMBIO: Si es admin muestra "Administrador", si no, el nombre */}
-                  <span>{esAdmin ? "Administrador" : usuarioGuardado.nombre}</span>
+                  {/* Si detectamos que es admin, forzamos el texto "Administrador" */}
+                  <span>{esAdmin ? "Administrador" : (usuarioGuardado.nombre || "Usuario")}</span>
                 </button>
                 
                 <ul className="dropdown-menu dropdown-menu-end dropdown-menu-dark shadow" aria-labelledby="userMenu">
                   <li><h6 className="dropdown-header">Mi Cuenta</h6></li>
                   
-                  {/* Solo mostramos el Panel si es Admin */}
+                  {/* SOLO SE VE SI LA LÓGICA DE ADMIN FUNCIONÓ */}
                   {esAdmin && (
                     <li>
                       <Link className="dropdown-item text-warning fw-bold" to="/admin/dashboard">
