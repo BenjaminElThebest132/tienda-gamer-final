@@ -1,20 +1,31 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useCart } from '../context/CartContext';
+import { useCart } from '../context/CartContext'; // SI TE DA ERROR AQUÍ, PRUEBA CON './CartContext'
 
 export default function Navbar() {
   const { cart } = useCart();
   const navigate = useNavigate();
-  
-  const usuarioGuardado = JSON.parse(localStorage.getItem('usuario'));
-  
-  // Sumamos la cantidad total de productos
+
+  // 1. Recuperamos el usuario (con protección anti-crash)
+  let usuarioGuardado = null;
+  try {
+    usuarioGuardado = JSON.parse(localStorage.getItem('usuario'));
+  } catch (e) {
+    usuarioGuardado = null;
+  }
+
+  // Calculamos items del carrito
   const totalItems = cart.reduce((acc, item) => acc + item.quantity, 0);
 
+  // Logout
   const handleLogout = () => {
     localStorage.removeItem('usuario');
     navigate('/login');
   };
+
+  // 2. VERIFICACIÓN DE ADMIN
+  // Si existe usuario Y su email es el del jefe...
+  const esAdmin = usuarioGuardado && usuarioGuardado.email === 'admin@tienda.com';
 
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark fixed-top shadow">
@@ -23,7 +34,12 @@ export default function Navbar() {
            🎮 TiendaGamer
         </Link>
         
-        <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <button 
+          className="navbar-toggler" 
+          type="button" 
+          data-bs-toggle="collapse" 
+          data-bs-target="#navbarNav"
+        >
           <span className="navbar-toggler-icon"></span>
         </button>
         
@@ -34,45 +50,53 @@ export default function Navbar() {
             <li className="nav-item"><Link className="nav-link" to="/categorias">Categorías</Link></li>
             <li className="nav-item"><Link className="nav-link" to="/ofertas">Ofertas</Link></li>
             <li className="nav-item"><Link className="nav-link" to="/nosotros">Nosotros</Link></li>
-            <li className="nav-item"><Link className="nav-link" to="/blog">Blog</Link></li>
             <li className="nav-item"><Link className="nav-link" to="/contacto">Contacto</Link></li>
           </ul>
 
           <div className="d-flex align-items-center gap-3">
             
-            {/* BOTÓN CARRITO */}
-            <Link to="/checkout" className="btn btn-outline-success fw-bold">
-              🛒 Carrito {totalItems > 0 ? `(${totalItems})` : ''}
+            {/* Botón Carrito */}
+            <Link to="/checkout" className="btn btn-outline-success fw-bold position-relative">
+               🛒 Carrito
+               {totalItems > 0 && (
+                 <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                   {totalItems}
+                 </span>
+               )}
             </Link>
 
-            {/* MENU DE USUARIO (DROPDOWN) */}
+            {/* Menú de Usuario */}
             {usuarioGuardado ? (
               <div className="dropdown">
-                {/* El atributo data-bs-toggle="dropdown" es el que hace la magia */}
                 <button 
-                  className="btn btn-secondary dropdown-toggle" 
+                  className="btn btn-secondary dropdown-toggle d-flex align-items-center gap-2" 
                   type="button" 
                   id="userMenu" 
                   data-bs-toggle="dropdown" 
                   aria-expanded="false"
                 >
-                  👤 {usuarioGuardado.nombre}
+                  <i className="bi bi-person-circle"></i>
+                  {/* AQUÍ ESTÁ EL CAMBIO: Si es admin muestra "Administrador", si no, el nombre */}
+                  <span>{esAdmin ? "Administrador" : usuarioGuardado.nombre}</span>
                 </button>
                 
-                <ul className="dropdown-menu dropdown-menu-end dropdown-menu-dark" aria-labelledby="userMenu">
-                  {/* Link al Admin (Visible para todos para la demo) */}
-                  <li>
-                    <Link className="dropdown-item text-warning" to="/admin/dashboard">
-                      ⚙️ Panel Admin
-                    </Link>
-                  </li>
+                <ul className="dropdown-menu dropdown-menu-end dropdown-menu-dark shadow" aria-labelledby="userMenu">
+                  <li><h6 className="dropdown-header">Mi Cuenta</h6></li>
                   
+                  {/* Solo mostramos el Panel si es Admin */}
+                  {esAdmin && (
+                    <li>
+                      <Link className="dropdown-item text-warning fw-bold" to="/admin/dashboard">
+                        ⚙️ Panel Admin
+                      </Link>
+                    </li>
+                  )}
+                  
+                  <li><Link className="dropdown-item" to="/mis-ordenes">📦 Mis Pedidos</Link></li>
                   <li><hr className="dropdown-divider" /></li>
-                  
-                  {/* Logout */}
                   <li>
-                    <button className="dropdown-item text-danger" onClick={handleLogout}>
-                      Cerrar Sesión
+                    <button className="dropdown-item text-danger fw-bold" onClick={handleLogout}>
+                      🚪 Cerrar Sesión
                     </button>
                   </li>
                 </ul>
