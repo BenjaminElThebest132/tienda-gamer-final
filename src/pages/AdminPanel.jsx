@@ -2,15 +2,19 @@ import React from 'react';
 import { Routes, Route, NavLink, Navigate } from 'react-router-dom';
 import './AdminPanel.css';
 
-// --- ESTAS SON LAS RUTAS DE IMPORTACIÓN CORRECTAS Y LIMPIAS ---
-import { AdminDashboard, AdminOrdenes, AdminUsuarios, AdminCategorias, AdminReportes } from '../components/admin/AdminStubs';
+// 1. COMPONENTES REALES (Los que ya terminamos)
+import AdminOrdenes from '../components/admin/AdminOrdenes';
+import AdminUsuarios from '../components/admin/AdminUsuarios';
 import AdminProductos from '../components/admin/AdminProducto';
 
+// 2. COMPONENTES DE RELLENO (Los que faltan por hacer)
+// NOTA: He quitado 'AdminOrdenes' y 'AdminUsuarios' de aquí para evitar el duplicado
+import { AdminDashboard, AdminCategorias, AdminReportes } from '../components/admin/AdminStubs';
 
 export default function AdminPanel() {
   return (
     <div className="d-flex admin-panel-container">
-      {/* Sidebar */}
+      {/* Sidebar - Menú Lateral */}
       <div className="sidebar bg-dark text-white p-3">
         <h4 className="mb-4">Dashboard</h4>
         <ul className="nav nav-pills flex-column">
@@ -35,8 +39,8 @@ export default function AdminPanel() {
         </ul>
       </div>
 
-      {/* Main Content */}
-      <div className="content p-4">
+      {/* Main Content - Área de Trabajo */}
+      <div className="content p-4 w-100">
         <Routes>
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="productos" element={<AdminProductos />} />
@@ -50,4 +54,3 @@ export default function AdminPanel() {
     </div>
   );
 }
-
