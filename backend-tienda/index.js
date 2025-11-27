@@ -25,9 +25,6 @@ app.use(express.json());
 
 app.get('/', (req, res) => res.send('API Tienda Gamer Full Stack 🚀'));
 
-// ==========================================
-//              CRUD PRODUCTOS (5 Endpoints)
-// ==========================================
 app.post('/api/productos', async (req, res) => {
     try {
         const prod = await Producto.create(req.body);
@@ -57,9 +54,6 @@ app.delete('/api/productos/:id', async (req, res) => {
     res.json({ mensaje: "Producto eliminado" });
 });
 
-// ==========================================
-//              CRUD CATEGORIAS (5 Endpoints)
-// ==========================================
 app.post('/api/categorias', async (req, res) => {
     const cat = await Categoria.create(req.body);
     res.status(201).json(cat);
@@ -85,9 +79,6 @@ app.delete('/api/categorias/:id', async (req, res) => {
     res.json({ mensaje: "Categoría eliminada" });
 });
 
-// ==========================================
-//              RUTAS USUARIOS / ORDENES
-// ==========================================
 app.post('/api/registro', async (req, res) => {
     try {
         const { nombre, email, password } = req.body;
@@ -123,8 +114,6 @@ app.get('/api/ordenes', async (req, res) => {
     res.json(ordenes);
 });
 
-// --- ARRANQUE ---
-// 'alter: true' actualiza las tablas si agregamos columnas nuevas (como las relaciones)
 sequelize.sync({ alter: true }).then(() => {
     console.log("✅ TODAS LAS TABLAS SINCRONIZADAS (Productos, Usuarios, Categorías, Órdenes)");
     app.listen(PORT, () => {
