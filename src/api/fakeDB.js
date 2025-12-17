@@ -6,7 +6,7 @@ let products = [
 ];
 
 let users = [
-  { id: 1, username: 'admin', password: 'admin123', role: 'admin' },
+  { id: 1, username: 'admin@tienda.com', password: '12345', role: 'admin' },
   { id: 2, username: 'user', password: 'user123', role: 'user' }
 ];
 
@@ -42,6 +42,23 @@ export const db = {
     if (!u) return null;
     // token simulado
     return { token: btoa(`${u.id}:${u.username}:${u.role}`), user: { id: u.id, username: u.username, role: u.role } };
+  },
+  getUsers: async () => { await wait(); return [...users]; },
+  createUser: async (user) => {
+    await wait();
+    const existingUser = users.find(u => u.username === user.username);
+    if (existingUser) {
+      throw new Error('User already exists');
+    }
+    const id = Math.max(0, ...users.map(u => u.id)) + 1;
+    const newUser = { id, ...user, role: 'user' };
+    users.push(newUser);
+    return { user: { id: newUser.id, username: newUser.username, role: newUser.role } };
+  },
+  deleteUser: async (id) => {
+    await wait();
+    users = users.filter(p => p.id !== +id);
+    return true;
   },
   createOrder: async (order) => {
     await wait();

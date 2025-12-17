@@ -7,9 +7,8 @@ import AdminOrdenes from '../components/admin/AdminOrdenes';
 import AdminUsuarios from '../components/admin/AdminUsuarios';
 import AdminProductos from '../components/admin/AdminProducto';
 
-// 2. COMPONENTES DE RELLENO (Los que faltan por hacer)
-// NOTA: He quitado 'AdminOrdenes' y 'AdminUsuarios' de aquí para evitar el duplicado
-import { AdminDashboard, AdminCategorias, AdminReportes } from '../components/admin/AdminStubs';
+// 2. COMPONENTES DE RELLENO (Solo para el resumen)
+import { AdminDashboard } from '../components/admin/AdminStubs';
 
 export default function AdminPanel() {
   return (
@@ -30,12 +29,6 @@ export default function AdminPanel() {
           <li className="nav-item">
             <NavLink to="/admin/usuarios" className="nav-link text-white">Usuarios</NavLink>
           </li>
-           <li className="nav-item">
-            <NavLink to="/admin/categorias" className="nav-link text-white">Categorías</NavLink>
-          </li>
-          <li className="nav-item">
-            <NavLink to="/admin/reportes" className="nav-link text-white">Reportes</NavLink>
-          </li>
         </ul>
       </div>
 
@@ -46,8 +39,6 @@ export default function AdminPanel() {
           <Route path="productos" element={<AdminProductos />} />
           <Route path="ordenes" element={<AdminOrdenes />} />
           <Route path="usuarios" element={<AdminUsuarios />} />
-          <Route path="categorias" element={<AdminCategorias />} />
-          <Route path="reportes" element={<AdminReportes />} />
           <Route path="*" element={<Navigate to="dashboard" replace />} />
         </Routes>
       </div>

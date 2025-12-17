@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext'; // Importar useAuth
 
 export default function Login() {
   const [formData, setFormData] = useState({ email: '', password: '' });
-  const [loading, setLoading] = useState(false); // Para mostrar que está cargando
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { login } = useAuth(); // Usar el hook de autenticación
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -12,49 +15,23 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true); // Activamos estado de carga
-    
-    // 1. SOLUCIÓN MAYÚSCULAS: Forzamos minúsculas antes de enviar
-    const datosLogin = {
-        email: formData.email.toLowerCase().trim(), // "Admin" -> "admin"
-        password: formData.password
-    };
+    setLoading(true);
+    setError('');
 
     try {
-      // 2. PETICIÓN AL SERVIDOR
-      const response = await fetch('https://tienda-gamer-final.onrender.com/api/usuarios/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(datosLogin)
-      });
-
-      // Verificación de seguridad por si el servidor devuelve error HTML (común en Render)
-      const contentType = response.headers.get("content-type");
-      if (!contentType || !contentType.includes("application/json")) {
-        throw new Error("El servidor está despertando... espera 30 seg e intenta de nuevo.");
-      }
-
-      const data = await response.json();
-
-      if (response.ok) {
-        // Guardamos usuario
-        localStorage.setItem('usuario', JSON.stringify(data.usuario || data));
-        
-        // 3. REDIRECCIÓN
-        if (datosLogin.email === 'admin@tienda.com') {
-          window.location.href = '/admin/dashboard'; // Forzamos recarga hacia admin
-        } else {
-          window.location.href = '/'; // Forzamos recarga hacia home
-        }
+      // Usar la función de login del contexto
+      const user = await login(formData.email, formData.password);
+      
+      // Redirección basada en el rol del usuario
+      if (user.role === 'admin') {
+        navigate('/admin/dashboard');
       } else {
-        alert(data.message || "Correo o contraseña incorrectos");
+        navigate('/');
       }
-    } catch (error) {
-      console.error(error);
-      // Mensaje explicativo para ti y el profesor
-      alert("Error de conexión: Es probable que el servidor de Render esté 'despertando'. Espera 30 segundos y vuelve a dar clic en Entrar.");
+    } catch (err) {
+      setError(err.message || 'Correo o contraseña incorrectos.');
     } finally {
-      setLoading(false); // Desactivamos carga
+      setLoading(false);
     }
   };
 
@@ -64,6 +41,7 @@ export default function Login() {
         <h2 className="text-center mb-4">🎮 Login Gamer</h2>
         
         <form onSubmit={handleSubmit}>
+          {error && <div className="alert alert-danger">{error}</div>}
           <div className="mb-3">
             <label className="form-label">Email</label>
             <input 
@@ -90,7 +68,7 @@ export default function Login() {
           </div>
           
           <button type="submit" className="btn btn-primary w-100 fw-bold" disabled={loading}>
-            {loading ? "Conectando con servidor..." : "ENTRAR"}
+            {loading ? "Conectando..." : "ENTRAR"}
           </button>
         </form>
       </div>

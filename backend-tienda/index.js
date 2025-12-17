@@ -1,4 +1,3 @@
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 const express = require('express');
 const cors = require('cors');
 
@@ -85,7 +84,10 @@ app.post('/api/registro', async (req, res) => {
         const existe = await Usuario.findOne({ where: { email } });
         if (existe) return res.status(400).json({ error: "Email ya existe" });
         
-        const user = await Usuario.create({ nombre, email, password });
+        // Si el email es el del admin, le asignamos el rol de 'admin'
+        const rol = email === 'admin@tienda.com' ? 'admin' : 'cliente';
+        
+        const user = await Usuario.create({ nombre, email, password, rol });
         res.status(201).json({ mensaje: "Usuario creado", usuario: user });
     } catch (e) { res.status(500).json({ error: "Error registro" }); }
 });

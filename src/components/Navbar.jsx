@@ -1,36 +1,18 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext'; // 1. Importar el hook de autenticación
 
 export default function Navbar() {
   const { cart } = useCart();
   const navigate = useNavigate();
-
-  // 1. Recuperamos el usuario de forma segura
-  let usuarioGuardado = null;
-  try {
-    usuarioGuardado = JSON.parse(localStorage.getItem('usuario'));
-  } catch (e) {
-    usuarioGuardado = null;
-  }
-
-  // 2. DETECTOR DE ADMIN (A prueba de fallos)
-  let esAdmin = false;
-  if (usuarioGuardado) {
-    // Buscamos el email ya sea que venga directo o dentro de un objeto 'usuario'
-    const email = usuarioGuardado.email || (usuarioGuardado.usuario && usuarioGuardado.usuario.email) || '';
-    
-    // Comparamos convirtiendo a minúsculas y quitando espacios vacíos
-    if (email.toLowerCase().trim() === 'admin@tienda.com') {
-      esAdmin = true;
-    }
-  }
+  const { user, isLoggedIn, isAdmin, logout } = useAuth(); // 2. Usar el contexto
 
   // Calculamos items del carrito
   const totalItems = cart.reduce((acc, item) => acc + item.quantity, 0);
 
   const handleLogout = () => {
-    localStorage.removeItem('usuario');
+    logout(); // Usar la función de logout del contexto
     navigate('/login');
   };
 
@@ -67,7 +49,7 @@ export default function Navbar() {
             </Link>
 
             {/* MENÚ DE USUARIO */}
-            {usuarioGuardado ? (
+            {isLoggedIn ? (
               <div className="dropdown">
                 <button 
                   className="btn btn-secondary dropdown-toggle d-flex align-items-center gap-2" 
@@ -77,15 +59,15 @@ export default function Navbar() {
                   aria-expanded="false"
                 >
                   <i className="bi bi-person-circle"></i>
-                  {/* Si detectamos que es admin, forzamos el texto "Administrador" */}
-                  <span>{esAdmin ? "Administrador" : (usuarioGuardado.nombre || "Usuario")}</span>
+                  {/* 3. Usar el estado del contexto directamente */}
+                  <span>{isAdmin ? "Administrador" : (user.nombre || "Usuario")}</span>
                 </button>
                 
                 <ul className="dropdown-menu dropdown-menu-end dropdown-menu-dark shadow" aria-labelledby="userMenu">
                   <li><h6 className="dropdown-header">Mi Cuenta</h6></li>
                   
-                  {/* SOLO SE VE SI LA LÓGICA DE ADMIN FUNCIONÓ */}
-                  {esAdmin && (
+                  {/* 4. Condición basada en el booleano del contexto */}
+                  {isAdmin && (
                     <li>
                       <Link className="dropdown-item text-warning fw-bold" to="/admin/dashboard">
                         ⚙️ Panel Admin
@@ -93,7 +75,6 @@ export default function Navbar() {
                     </li>
                   )}
                   
-                  <li><Link className="dropdown-item" to="/mis-ordenes">📦 Mis Pedidos</Link></li>
                   <li><hr className="dropdown-divider" /></li>
                   <li>
                     <button className="dropdown-item text-danger fw-bold" onClick={handleLogout}>

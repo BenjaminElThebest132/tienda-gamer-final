@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { db } from '../api/fakeDB';
 
 export default function Registro() {
   const [form, setForm] = useState({ nombre: '', email: '', password: '' });
@@ -16,23 +17,19 @@ export default function Registro() {
     setError('');
     setCargando(true);
 
+    if (!form.email || !form.password) {
+      setError("El correo y la contraseña son obligatorios.");
+      setCargando(false);
+      return;
+    }
+
     try {
-      const response = await fetch('https://tienda-gamer-final.onrender.com/api/registro', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form)
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        alert("¡Cuenta creada con éxito! Ahora puedes iniciar sesión.");
-        navigate('/login');
-      } else {
-        setError(data.error || "Error al registrarse");
-      }
+      // Usamos el email del formulario como 'username' para la BD simulada
+      await db.createUser({ username: form.email, password: form.password });
+      alert("¡Cuenta creada con éxito! Ahora puedes iniciar sesión.");
+      navigate('/login');
     } catch (err) {
-      setError("Error de conexión con el servidor.");
+      setError(err.message || "Error al registrarse.");
     } finally {
       setCargando(false);
     }

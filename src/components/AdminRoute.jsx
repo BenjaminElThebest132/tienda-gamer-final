@@ -1,23 +1,20 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 export default function AdminRoute({ children }) {
-  // 1. Leemos el usuario
-  let usuario = null;
-  try {
-    usuario = JSON.parse(localStorage.getItem('usuario'));
-  } catch (error) {
-    usuario = null;
+  const { isLoggedIn, isAdmin, loading } = useAuth();
+
+  // Mientras se verifica el estado de autenticación, no renderizamos nada
+  if (loading) {
+    return null; // O un componente de carga/spinner
   }
 
-  // 2. Verificamos que sea EL ADMIN (revisa que el email coincida con tu base de datos)
-  const esAdmin = usuario && (usuario.email === 'admin@tienda.com');
-
-  // 3. Si no es admin, lo mandamos al inicio
-  if (!esAdmin) {
-    return <Navigate to="/" replace />;
+  // Si está logueado y es admin, permitimos el acceso
+  if (isLoggedIn && isAdmin) {
+    return children;
   }
 
-  // Si es admin, lo dejamos pasar
-  return children;
+  // Si no cumple las condiciones, lo redirigimos al login
+  return <Navigate to="/login" replace />;
 }
