@@ -6,7 +6,6 @@ export default function MisOrdenes() {
     <div>
       <h1>Mis Pedidos</h1>
       <p>Aquí se mostrarán tus órdenes.</p>
-      {/* Puedes añadir la lógica para cargar las órdenes aquí */}
     </div>
   );
 }
